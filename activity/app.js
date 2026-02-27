@@ -30,11 +30,68 @@ function escapeHtml(str) {
 
 function renderConfig(config, src) {
   setHeader(config.title || "Untitled activity", `Loaded from: ${src}`);
-  document.getElementById("app").innerHTML = `
-    <div class="muted">✅ Engine loaded this config successfully.</div>
-    <p><strong>Next step:</strong> we’ll render the grid + original points here.</p>
-    <pre>${escapeHtml(JSON.stringify(config, null, 2))}</pre>
+
+  const { xmin, xmax, ymin, ymax } = config.grid;
+
+  const width = 600;
+  const height = 600;
+
+  const xScale = width / (xmax - xmin);
+  const yScale = height / (ymax - ymin);
+
+  function toSvgX(x) {
+    return (x - xmin) * xScale;
+  }
+
+  function toSvgY(y) {
+    return height - (y - ymin) * yScale;
+  }
+
+  let svg = `
+    <svg width="${width}" height="${height}" style="border:1px solid #ccc; background:white;">
   `;
+
+  // Draw grid lines
+  for (let x = xmin; x <= xmax; x++) {
+    const sx = toSvgX(x);
+    svg += `<line x1="${sx}" y1="0" x2="${sx}" y2="${height}" stroke="#eee"/>`;
+  }
+
+  for (let y = ymin; y <= ymax; y++) {
+    const sy = toSvgY(y);
+    svg += `<line x1="0" y1="${sy}" x2="${width}" y2="${sy}" stroke="#eee"/>`;
+  }
+
+  // Draw axes
+  svg += `<line x1="0" y1="${toSvgY(0)}" x2="${width}" y2="${toSvgY(0)}" stroke="black"/>`;
+  svg += `<line x1="${toSvgX(0)}" y1="0" x2="${toSvgX(0)}" y2="${height}" stroke="black"/>`;
+
+  // Draw original polyline
+  const points = config.original.points;
+
+  let pathData = points.map((p, i) => {
+    const x = toSvgX(p[0]);
+    const y = toSvgY(p[1]);
+    return `${i === 0 ? "M" : "L"} ${x} ${y}`;
+  }).join(" ");
+
+  svg += `<path d="${pathData}" fill="none" stroke="blue" stroke-width="2"/>`;
+
+  // Draw points
+  points.forEach(p => {
+    svg += `
+      <circle 
+        cx="${toSvgX(p[0])}" 
+        cy="${toSvgY(p[1])}" 
+        r="5" 
+        fill="blue"
+      />
+    `;
+  });
+
+  svg += `</svg>`;
+
+  document.getElementById("app").innerHTML = svg;
 }
 
 async function main() {
