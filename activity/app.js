@@ -124,11 +124,11 @@ function renderConfig(config, src) {
     svg += '<circle cx="' + toSvgX(p[0]) + '" cy="' + toSvgY(p[1]) + '" r="5" fill="#2563eb" />';
   }
 
-  // 🔵 Function label
-  // Position: near top-right, inside the grid.
-  const labelX = toSvgX(xmax - 2);
-  const labelY = toSvgY(ymax - 1);
-  svg += '<text x="' + labelX + '" y="' + labelY + '" style="font-family: Arial, sans-serif; font-size: 16px; fill: #2563eb; font-weight: 600; pointer-events: none;">y = f(x)</text>';
+  // 🔵 Function label (pixel-positioned so it ALWAYS shows)
+  // Top-right corner with padding.
+  svg += '<text x="' + (width - 110) + '" y="28" ' +
+         'style="font-family: Arial, sans-serif; font-size: 16px; fill: #2563eb; font-weight: 600; pointer-events: none;">' +
+         'y = f(x)</text>';
 
   svg += "</svg>";
   appEl.innerHTML = svg;
