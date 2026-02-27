@@ -11,7 +11,10 @@ export function render(state) {
   const expectedPoints = state.expectedPoints;
 
   // Raw clicks (for counters / attempts)
-  const rawStudentPoints = state.studentPoints;
+  const rawStudentPoints = state.studentPoints ?? [];
+
+  // Safeguard: orderedStudentPoints may not exist yet
+  const orderedStudentPoints = state.orderedStudentPoints ?? [];
 
   const xmin = config.grid.xmin;
   const xmax = config.grid.xmax;
@@ -76,8 +79,8 @@ export function render(state) {
   // ===============================
 
   // Step 5.2 — Attempt line: connects raw clicks in the order clicked (faint)
-  if (state.studentPoints.length > 1) {
-    svg += `<path d="${buildPath(state.studentPoints)}"
+  if (rawStudentPoints.length > 1) {
+    svg += `<path d="${buildPath(rawStudentPoints)}"
                  fill="none"
                  stroke="#dc2626"
                  stroke-width="3"
@@ -85,8 +88,8 @@ export function render(state) {
   }
 
   // Step 5.3 — Clean line: connects matched vertices in expected order (solid)
-  if (state.orderedStudentPoints.length > 1) {
-    svg += `<path d="${buildPath(state.orderedStudentPoints)}"
+  if (orderedStudentPoints.length > 1) {
+    svg += `<path d="${buildPath(orderedStudentPoints)}"
                  fill="none"
                  stroke="#dc2626"
                  stroke-width="3"
@@ -94,7 +97,7 @@ export function render(state) {
   }
 
   // Step 5.4 — Draw points (raw only) so we don’t leak correctness
-  state.studentPoints.forEach(p => {
+  rawStudentPoints.forEach(p => {
     svg += `<circle cx="${toSvgX(p[0])}"
                     cy="${toSvgY(p[1])}"
                     r="${POINT_R}"
@@ -102,13 +105,13 @@ export function render(state) {
   });
 
   // ✅ Solution overlay — thicker and green
-  if (state.showSolution && state.expectedPoints.length > 0) {
-    svg += `<path d="${buildPath(state.expectedPoints)}"
+  if (state.showSolution && expectedPoints.length > 0) {
+    svg += `<path d="${buildPath(expectedPoints)}"
                  fill="none"
                  stroke="#16a34a"
                  stroke-width="5"/>`;
 
-    state.expectedPoints.forEach(p => {
+    expectedPoints.forEach(p => {
       svg += `<circle cx="${toSvgX(p[0])}"
                       cy="${toSvgY(p[1])}"
                       r="${POINT_R}"
