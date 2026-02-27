@@ -1,5 +1,7 @@
 // engine/interaction.js
 
+import { orderStudentPoints } from "./validator.js";
+
 export function attachGraphInteraction(state, onStateChange) {
 
   document.addEventListener("click", function (e) {
@@ -35,6 +37,12 @@ export function attachGraphInteraction(state, onStateChange) {
     ];
 
     state.studentPoints.push(snapped);
+
+    state.studentPoints = orderStudentPoints(
+      state.expectedPoints,
+      state.studentPoints
+    );
+
     onStateChange();
   });
 
