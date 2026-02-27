@@ -9,7 +9,14 @@ export function render(state) {
   const config = state.config;
   const originalPoints = config.original.points;
   const expectedPoints = state.expectedPoints;
-  const studentPoints = state.studentPoints;
+
+  // Raw clicks (for counters / attempts)
+  const rawStudentPoints = state.studentPoints;
+
+  // Ordered view (for drawing)
+  const studentPoints = state.orderedStudentPoints?.length
+    ? state.orderedStudentPoints
+    : rawStudentPoints;
 
   const xmin = config.grid.xmin;
   const xmax = config.grid.xmax;
@@ -65,7 +72,7 @@ export function render(state) {
                     fill="#2563eb"/>`;
   });
 
-  // Student graph (red)
+  // Student graph (red) — draw from ordered points when available
   if (studentPoints.length > 0) {
     svg += `<path d="${buildPath(studentPoints)}"
                  fill="none"
@@ -117,7 +124,8 @@ export function render(state) {
       </div>
 
       <p>Expected points: ${expectedPoints.length}</p>
-      <p>Student points: ${studentPoints.length}</p>
+      <!-- Optional UI fix: show raw click count -->
+      <p>Student points: ${rawStudentPoints.length}</p>
 
       ${svg}
     </div>

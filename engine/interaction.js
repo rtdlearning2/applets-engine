@@ -36,9 +36,17 @@ export function attachGraphInteraction(state, onStateChange) {
       Math.round(graphY)
     ];
 
+    // Prevent duplicate clicks on the same vertex
+    const alreadyClicked = state.studentPoints.some(
+      p => p[0] === snapped[0] && p[1] === snapped[1]
+    );
+    if (alreadyClicked) return;
+
+    // Keep raw clicks in studentPoints
     state.studentPoints.push(snapped);
 
-    state.studentPoints = orderStudentPoints(
+    // Compute ordered view separately
+    state.orderedStudentPoints = orderStudentPoints(
       state.expectedPoints,
       state.studentPoints
     );

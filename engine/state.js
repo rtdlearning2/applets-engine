@@ -11,6 +11,7 @@ export function createAppState({ config, src }) {
       config?.transform
     ),
     studentPoints: [],
+    orderedStudentPoints: [],
     showSolution: false,
     lastSubmitCorrect: null,
     feedback: ""
@@ -30,6 +31,7 @@ export function createAppState({ config, src }) {
 
   state.reset = function () {
     state.studentPoints = [];
+    state.orderedStudentPoints = [];
     state.feedback = "";
     state.showSolution = false;
     state.lastSubmitCorrect = null;
