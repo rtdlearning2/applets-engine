@@ -66,6 +66,29 @@ function buildPathData(points, toSvgX, toSvgY) {
 }
 
 function renderConfig(config, src) {
+  // --- NEW: Normalize config so "transform" exists at the top level for reflect-x activities ---
+  // This matches the desired JSON shape:
+  // {
+  //   "title": "...",
+  //   "grid": { ... },
+  //   "original": { ... },
+  //   "transform": { "type": "reflect_x" }
+  // }
+  try {
+    const title = (config && config.title) ? String(config.title) : "";
+    const srcStr = src ? String(src) : "";
+    const looksLikeReflectX =
+      (srcStr.indexOf("reflect_x") !== -1) ||
+      (title.toLowerCase().indexOf("reflect across the x-axis") !== -1) ||
+      (title.toLowerCase().indexOf("reflect across the x axis") !== -1);
+
+    if (looksLikeReflectX && (!config.transform || !config.transform.type)) {
+      config.transform = { type: "reflect_x" };
+    }
+  } catch (e) {
+    // If anything weird happens, don't block rendering; just proceed as-is.
+  }
+
   setHeader((config && config.title) ? config.title : "Untitled activity", "Loaded from: " + src);
 
   const appEl = document.getElementById("app");
