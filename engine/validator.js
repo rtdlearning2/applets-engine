@@ -2,8 +2,8 @@
 console.log("validator.js loaded v1");
 
 export function validateSubmission(state) {
-  const student = state.studentPoints ?? [];
   const expected = state.expectedPoints ?? [];
+  const student = state.studentPoints ?? [];
 
   if (student.length !== expected.length) {
     return {
@@ -12,16 +12,26 @@ export function validateSubmission(state) {
     };
   }
 
-  for (let i = 0; i < expected.length; i++) {
-    const s = student[i];
-    const e = expected[i];
+  const tolerance = 0; // later upgradeable
 
-    if (!s || !e || s[0] !== e[0] || s[1] !== e[1]) {
+  function pointsMatch(p1, p2) {
+    return (
+      Math.abs(p1[0] - p2[0]) <= tolerance &&
+      Math.abs(p1[1] - p2[1]) <= tolerance
+    );
+  }
+
+  const unmatchedStudent = [...student];
+
+  for (let exp of expected) {
+    const index = unmatchedStudent.findIndex(stu => pointsMatch(exp, stu));
+    if (index === -1) {
       return {
         correct: false,
         message: "That graph is not correct. Try again."
       };
     }
+    unmatchedStudent.splice(index, 1);
   }
 
   return {

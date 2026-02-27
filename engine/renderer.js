@@ -44,16 +44,12 @@ export function render(state) {
   // Grid
   for (let x = xmin; x <= xmax; x++) {
     const sx = toSvgX(x);
-    svg += `<line x1="${sx}" y1="0" x2="${sx}" y2="${height}" stroke="${
-      x === 0 ? "#000" : "#eee"
-    }"/>`;
+    svg += `<line x1="${sx}" y1="0" x2="${sx}" y2="${height}" stroke="${x === 0 ? "#000" : "#eee"}"/>`;
   }
 
   for (let y = ymin; y <= ymax; y++) {
     const sy = toSvgY(y);
-    svg += `<line x1="0" y1="${sy}" x2="${width}" y2="${sy}" stroke="${
-      y === 0 ? "#000" : "#eee"
-    }"/>`;
+    svg += `<line x1="0" y1="${sy}" x2="${width}" y2="${sy}" stroke="${y === 0 ? "#000" : "#eee"}"/>`;
   }
 
   // Original graph (blue)
@@ -84,6 +80,21 @@ export function render(state) {
     });
   }
 
+  // ✅ Solution overlay — thicker and green
+  if (state.showSolution && state.expectedPoints.length > 0) {
+    svg += `<path d="${buildPath(state.expectedPoints)}"
+                 fill="none"
+                 stroke="#16a34a"
+                 stroke-width="5"/>`;
+
+    state.expectedPoints.forEach(p => {
+      svg += `<circle cx="${toSvgX(p[0])}"
+                      cy="${toSvgY(p[1])}"
+                      r="6"
+                      fill="#16a34a"/>`;
+    });
+  }
+
   svg += `</svg>`;
 
   container.innerHTML = `
@@ -94,6 +105,11 @@ export function render(state) {
         <button id="undoBtn">Undo</button>
         <button id="resetBtn">Reset</button>
         <button id="submitBtn">Submit</button>
+        ${
+          !state.showSolution && state.lastSubmitCorrect === false
+            ? `<button id="solutionBtn">See Solution</button>`
+            : ""
+        }
       </div>
 
       <div id="feedback" style="margin:10px 0; font-weight:600;">
@@ -119,12 +135,23 @@ export function render(state) {
     render(state);
   });
 
-  // Submit
+  // Submit (semantic correctness)
   document.getElementById("submitBtn")?.addEventListener("click", () => {
     const result = validateSubmission(state);
 
     state.feedback = result.message;
+    state.lastSubmitCorrect = result.correct;
 
+    if (!result.correct) {
+      state.showSolution = false;
+    }
+
+    render(state);
+  });
+
+  // Solution button
+  document.getElementById("solutionBtn")?.addEventListener("click", () => {
+    state.enableSolution();
     render(state);
   });
 }
