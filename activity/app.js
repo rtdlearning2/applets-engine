@@ -1,3 +1,6 @@
+```js
+// app.js (full replacement)
+
 async function fetchJson(url) {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Could not load config (${res.status}) from ${url}`);
@@ -59,9 +62,10 @@ function renderConfig(config, src) {
   const toSvgX = (x) => (x - xmin) * xScale;
   const toSvgY = (y) => height - (y - ymin) * yScale;
 
-  // Grid lines
+  // SVG builder
   let svg = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" style="border:1px solid #ccc; background:white;">`;
 
+  // Grid lines
   for (let x = xmin; x <= xmax; x++) {
     const sx = toSvgX(x);
     const stroke = (x === 0) ? "#000" : "#eee";
@@ -74,6 +78,25 @@ function renderConfig(config, src) {
     const stroke = (y === 0) ? "#000" : "#eee";
     const strokeWidth = (y === 0) ? 1.5 : 1;
     svg += `<line x1="0" y1="${sy}" x2="${width}" y2="${sy}" stroke="${stroke}" stroke-width="${strokeWidth}"/>`;
+  }
+
+  // Axis numbers (tick labels)
+  // - X labels placed along y=0 (slightly below the axis)
+  // - Y labels placed along x=0 (slightly left of the axis)
+  // Note: We skip 0 by default to keep the origin clean.
+  const axisLabelStyle = `font-family: Arial, sans-serif; font-size: 12px; fill: #666; user-select: none;`;
+  for (let x = xmin; x <= xmax; x++) {
+    if (x === 0) continue;
+    const sx = toSvgX(x);
+    const sy0 = toSvgY(0);
+    svg += `<text x="${sx}" y="${sy0 + 18}" text-anchor="middle" style="${axisLabelStyle}">${x}</text>`;
+  }
+
+  for (let y = ymin; y <= ymax; y++) {
+    if (y === 0) continue;
+    const sx0 = toSvgX(0);
+    const sy = toSvgY(y);
+    svg += `<text x="${sx0 - 10}" y="${sy + 4}" text-anchor="end" style="${axisLabelStyle}">${y}</text>`;
   }
 
   // Original polyline
@@ -117,3 +140,4 @@ async function main() {
 }
 
 main().catch(showError);
+```
