@@ -1,5 +1,5 @@
 // app.js (no template strings)
-
+console.log("APP.JS LOADED");
 async function fetchJson(url) {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("Could not load config (" + res.status + ") from " + url);
