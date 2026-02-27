@@ -3,7 +3,7 @@
 
 async function fetchJson(url) {
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Could not load config (${res.status}) from ${url}`);
+  if (!res.ok) throw new Error("Could not load config (" + res.status + ") from " + url);
   return res.json();
 }
 
