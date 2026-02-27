@@ -1,0 +1,23 @@
+{
+  "name": "applets-engine",
+  "version": "1.0.0",
+  "description": "For hosing interactive applets we'll make for iSpring courses",
+  "main": "index.js",
+"scripts": {
+  "dev": "vite"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rtdlearning2/applets-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rtdlearning2/applets-engine/issues"
+  },
+  "homepage": "https://github.com/rtdlearning2/applets-engine#readme",
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}
