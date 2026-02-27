@@ -41,6 +41,23 @@ function showError(err) {
     '<div class="muted">Fix the URL or config path and reload.</div>' +
     "<pre>" + details + "</pre>";
 }
+function applyTransform(points, transform) {
+  if (!transform || !transform.type) return points;
+
+  if (transform.type === "reflect_x") {
+    return points.map(function (p) {
+      return [p[0], -p[1]];
+    });
+  }
+
+  if (transform.type === "reflect_y") {
+    return points.map(function (p) {
+      return [-p[0], p[1]];
+    });
+  }
+
+  return points;
+}
 
 function renderConfig(config, src) {
   setHeader((config && config.title) ? config.title : "Untitled activity", "Loaded from: " + src);
