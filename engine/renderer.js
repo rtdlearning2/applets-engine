@@ -89,19 +89,21 @@ export function render(state) {
     });
   }
 
-  // Solution overlay
-  if (state.showSolution && expectedPoints.length > 0) {
-    const pts = expectedPoints.map(toObj);
-    seriesList.push({
-      type: "polyline",
-      points: pts,
-      style: { stroke: "#16a34a", strokeWidth: 5 }
-    });
-    seriesList.push({
-      type: "points",
-      points: pts,
-      style: { fill: "#16a34a", r: 5 }
-    });
+  // Solution overlay (never before submit)
+  if (state.submitted) {
+    if (state.showSolution && expectedPoints.length > 0) {
+      const pts = expectedPoints.map(toObj);
+      seriesList.push({
+        type: "polyline",
+        points: pts,
+        style: { stroke: "#16a34a", strokeWidth: 5 }
+      });
+      seriesList.push({
+        type: "points",
+        points: pts,
+        style: { fill: "#16a34a", r: 5 }
+      });
+    }
   }
 
   svg = renderSeries(svg, seriesList, state.view, { width, height });
@@ -163,6 +165,7 @@ export function render(state) {
     const activityType = state.config?.activityType ?? "transformations";
     const result = validate(activityType, state, state.config);
 
+    state.submitted = true;
     state.feedback = result?.details?.message ?? "";
     state.lastSubmitCorrect = Boolean(result?.isCorrect);
 

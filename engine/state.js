@@ -40,6 +40,7 @@ export function createAppState({ config, src }) {
     showSolution: false,
     lastSubmitCorrect: null,
     feedback: "",
+    submitted: false,
     view: {
       xmin: normalizedConfig.grid.xmin,
       xmax: normalizedConfig.grid.xmax,
@@ -95,6 +96,7 @@ state.undo = function () {
     state.feedback = "";
     state.showSolution = false;
     state.lastSubmitCorrect = null;
+    state.submitted = false;
   };
 
   return state;

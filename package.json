@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "For hosing interactive applets we'll make for iSpring courses",
   "main": "index.js",
-"scripts": {
-  "dev": "vite"
-},
+  "scripts": {
+    "dev": "vite"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rtdlearning2/applets-engine.git"
