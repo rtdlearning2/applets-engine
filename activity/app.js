@@ -41,22 +41,28 @@ function showError(err) {
     '<div class="muted">Fix the URL or config path and reload.</div>' +
     "<pre>" + details + "</pre>";
 }
+
 function applyTransform(points, transform) {
   if (!transform || !transform.type) return points;
 
   if (transform.type === "reflect_x") {
-    return points.map(function (p) {
-      return [p[0], -p[1]];
-    });
+    return points.map(function (p) { return [p[0], -p[1]]; });
   }
 
   if (transform.type === "reflect_y") {
-    return points.map(function (p) {
-      return [-p[0], p[1]];
-    });
+    return points.map(function (p) { return [-p[0], p[1]]; });
   }
 
   return points;
+}
+
+function buildPathData(points, toSvgX, toSvgY) {
+  let pathData = "";
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i];
+    pathData += (i === 0 ? "M " : "L ") + toSvgX(p[0]) + " " + toSvgY(p[1]) + " ";
+  }
+  return pathData.trim();
 }
 
 function renderConfig(config, src) {
@@ -122,27 +128,42 @@ function renderConfig(config, src) {
     svg += '<text x="' + (sx0 - 10) + '" y="' + (sy + 4) + '" text-anchor="end" style="' + axisLabelStyle + '">' + y + "</text>";
   }
 
-  // Original polyline
-  const points = config.original.points;
+  // Points
+  const originalPoints = config.original.points;
 
-  let pathData = "";
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
-    pathData += (i === 0 ? "M " : "L ") + toSvgX(p[0]) + " " + toSvgY(p[1]) + " ";
+  // --- NEW: Expected/ghost graph (transformed) ---
+  // Draw FIRST so the blue sits on top.
+  if (config.transform && config.transform.type) {
+    const expectedPoints = applyTransform(originalPoints, config.transform);
+
+    const expectedPath = buildPathData(expectedPoints, toSvgX, toSvgY);
+
+    // dashed green line
+    if (config.original.connectLines !== false) {
+      svg += '<path d="' + expectedPath + '" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="7 5" opacity="0.85" />';
+    }
+
+    // green points
+    for (let i = 0; i < expectedPoints.length; i++) {
+      const p = expectedPoints[i];
+      svg += '<circle cx="' + toSvgX(p[0]) + '" cy="' + toSvgY(p[1]) + '" r="5" fill="#16a34a" opacity="0.85" />';
+    }
   }
+
+  // --- Original polyline (blue) ---
+  const originalPath = buildPathData(originalPoints, toSvgX, toSvgY);
 
   if (config.original.connectLines !== false) {
-    svg += '<path d="' + pathData.trim() + '" fill="none" stroke="#2563eb" stroke-width="2.5" />';
+    svg += '<path d="' + originalPath + '" fill="none" stroke="#2563eb" stroke-width="2.5" />';
   }
 
-  // Points
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
+  // Original points (blue)
+  for (let i = 0; i < originalPoints.length; i++) {
+    const p = originalPoints[i];
     svg += '<circle cx="' + toSvgX(p[0]) + '" cy="' + toSvgY(p[1]) + '" r="5" fill="#2563eb" />';
   }
 
   // 🔵 Function label (pixel-positioned so it ALWAYS shows)
-  // Top-right corner with padding.
   svg += '<text x="' + (width - 110) + '" y="28" ' +
          'style="font-family: Arial, sans-serif; font-size: 16px; fill: #2563eb; font-weight: 600; pointer-events: none;">' +
          'y = f(x)</text>';
